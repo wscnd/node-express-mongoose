@@ -158,9 +158,12 @@ describe('Authentication:', () => {
           expect(status).toBe(401)
           return this
         },
-        end() {
-          expect(true).toBe(true)
+        send(result) {
+          expect(typeof result.message).toBe('string')
         }
+        // end() {
+        //   expect(true).toBe(true)
+        // }
       }
 
       await protect(req, res)
@@ -175,9 +178,12 @@ describe('Authentication:', () => {
           expect(status).toBe(401)
           return this
         },
-        end() {
-          expect(true).toBe(true)
+        send(result) {
+          expect(typeof result.message).toBe('string')
         }
+        // end() {
+        //   expect(true).toBe(true)
+        // }
       }
 
       await protect(req, res)
@@ -192,8 +198,8 @@ describe('Authentication:', () => {
           expect(status).toBe(401)
           return this
         },
-        end() {
-          expect(true).toBe(true)
+        send(result) {
+          expect(typeof result.message).toBe('string')
         }
       }
 

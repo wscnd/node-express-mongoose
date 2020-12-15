@@ -58,6 +58,10 @@ userSchema.methods.checkPassword = function(password) {
         return reject(err)
       }
 
+      if (!same) {
+        return reject(same)
+      }
+
       resolve(same)
     })
   })
