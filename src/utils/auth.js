@@ -1,6 +1,7 @@
 import config from '../config'
 import { User } from '../models/user/user.model'
 import jwt from 'jsonwebtoken'
+import createError from 'http-errors'
 
 export const newToken = (user) => {
   return jwt.sign({ id: user.id }, config.secrets.jwt, {
@@ -16,7 +17,7 @@ export const verifyToken = (token) =>
     })
   })
 
-export const signup = async (req, res) => {
+export const signup = async (req, res, next) => {
   const { email, password } = req.body
 
   try {
@@ -25,44 +26,42 @@ export const signup = async (req, res) => {
     const token = newToken(user)
     return res.status(201).send({ token })
   } catch (err) {
-    return res.status(400).send({ message: err.message })
+    return next(createError(400, err.message))
   }
 }
 
-export const signin = async (req, res) => {
-  const { email, password } = req.body
-
-  if (!email || !password) {
-    return res.status(400).send({ message: 'Requires email and password' })
-  }
-
-  const user = await User.findOne({ email }).exec()
-
-  if (!user) {
-    return res.status(401).send({ message: 'Invalid email and password' })
-  }
-
+export const signin = async (req, res, next) => {
   try {
+    const { email, password } = req.body
+
+    if (!email || !password) {
+      return next(createError(400, 'Requires email and password'))
+    }
+
+    const user = await User.findOne({ email }).exec()
+
+    if (!user) {
+      return next(createError(401, 'Invalid email and password'))
+    }
+
     await user.checkPassword(password)
     const token = newToken(user)
     return res.status(201).send({ token })
   } catch (err) {
-    return res
-      .status(401)
-      .send({ message: `Wrong user or password ${err.message}` })
+    return next(createError(401, `Wrong user or password`))
   }
 }
 
 export const protect = async (req, res, next) => {
-  const { authorization } = req.headers
-
-  if (!authorization) {
-    return res.status(401).send({ message: 'You must be logged in.' })
-  }
-
-  const token = authorization.split('Bearer ')[1]
-
   try {
+    const { authorization } = req.headers
+
+    if (!authorization) {
+      return next(createError(401, 'You must be logged in.'))
+    }
+
+    const token = authorization.split('Bearer ')[1]
+
     const verification = await verifyToken(token)
 
     const user = await User.findById(verification.id)
@@ -71,12 +70,12 @@ export const protect = async (req, res, next) => {
       .exec()
 
     if (!user) {
-      return res.status(401).send({ message: 'Invalid User' })
+      return next(createError(401, 'Invalid User'))
     }
 
     req.user = user
   } catch (err) {
-    return res.status(401).send({ message: 'Invalid User' })
+    return next(createError(401, 'Invalid User'))
   }
 
   next()

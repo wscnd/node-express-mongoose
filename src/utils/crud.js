@@ -1,3 +1,5 @@
+import createError from 'http-errors'
+
 export const getOne = (model) => async (req, res, next) => {
   try {
     const doc = await model
@@ -11,8 +13,7 @@ export const getOne = (model) => async (req, res, next) => {
 
     res.status(200).json({ data: doc })
   } catch (err) {
-    err.status = 400
-    next(err)
+    return next(createError(400, err.message))
   }
 }
 
@@ -22,8 +23,7 @@ export const getMany = (model) => async (req, res, next) => {
 
     res.status(200).json({ data: docs })
   } catch (err) {
-    err.status = 400
-    next(err)
+    return next(createError(400, err.message))
   }
 }
 
@@ -33,8 +33,7 @@ export const createOne = (model) => async (req, res, next) => {
     const doc = await model.create({ ...req.body, createdBy })
     res.status(201).json({ data: doc })
   } catch (err) {
-    err.status = 400
-    next(err)
+    return next(createError(400, err.message))
   }
 }
 
@@ -53,13 +52,12 @@ export const updateOne = (model) => async (req, res, next) => {
       .exec()
 
     if (!updatedDoc) {
-      throw new Error('Not Found!')
+      return next(createError(400, 'Not Found!'))
     }
 
     res.status(200).json({ data: updatedDoc })
   } catch (err) {
-    err.status = 400
-    next(err)
+    return next(createError(400, err))
   }
 }
 
@@ -71,13 +69,12 @@ export const removeOne = (model) => async (req, res, next) => {
     })
 
     if (!removed) {
-      throw new Error('Not Found!')
+      return next(createError(400, 'Not Found!'))
     }
 
     return res.status(200).json({ data: removed })
   } catch (err) {
-    err.status = 400
-    next(err)
+    return next(createError(400, err.message))
   }
 }
 
