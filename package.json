@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/FrontendMasters/api-design-node-v3",
-  "author": "wscnd <wellingson@gmail.com>",
+  "author": "Scott Moss <willscottmoss@gmail.com>",
+  "contributors": [
+    "wscnd <wellingson@gmail.com>"
+  ],
   "scripts": {
     "build": "babel src --out-dir dist",
     "test": "cross-env NODE_ENV=testing jest --forceExit --detectOpenHandles  --silent",
