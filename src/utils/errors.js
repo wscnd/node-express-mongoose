@@ -1,5 +1,5 @@
 // error handler
-export default function (err, req, res) {
+export default function (err, req, res, next) {
   req.app?.get('env') === 'development'
     ? console.log(err.message)
     : console.log(err.message)
