@@ -2,7 +2,7 @@ import { newToken, verifyToken, signup, signin, protect } from '../auth'
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
 import config from '../../config'
-import { User } from '../../resources/user/user.model'
+import { User } from '../../models/user/user.model'
 
 describe('Authentication:', () => {
   describe('newToken', () => {
@@ -36,7 +36,7 @@ describe('Authentication:', () => {
         },
         send(result) {
           expect(typeof result.message).toBe('string')
-        }
+        },
       }
 
       await signup(req, res)
@@ -53,11 +53,9 @@ describe('Authentication:', () => {
         },
         async send(result) {
           let user = await verifyToken(result.token)
-          user = await User.findById(user.id)
-            .lean()
-            .exec()
+          user = await User.findById(user.id).lean().exec()
           expect(user.email).toBe('hello@hello.com')
-        }
+        },
       }
 
       await signup(req, res)
@@ -76,7 +74,7 @@ describe('Authentication:', () => {
         },
         send(result) {
           expect(typeof result.message).toBe('string')
-        }
+        },
       }
 
       await signin(req, res)
@@ -93,7 +91,7 @@ describe('Authentication:', () => {
         },
         send(result) {
           expect(typeof result.message).toBe('string')
-        }
+        },
       }
 
       await signin(req, res)
@@ -104,7 +102,7 @@ describe('Authentication:', () => {
 
       await User.create({
         email: 'hello@me.com',
-        password: 'yoyoyo'
+        password: 'yoyoyo',
       })
 
       const req = { body: { email: 'hello@me.com', password: 'wrong' } }
@@ -115,7 +113,7 @@ describe('Authentication:', () => {
         },
         send(result) {
           expect(typeof result.message).toBe('string')
-        }
+        },
       }
 
       await signin(req, res)
@@ -125,7 +123,7 @@ describe('Authentication:', () => {
       expect.assertions(2)
       const fields = {
         email: 'hello@me.com',
-        password: 'yoyoyo'
+        password: 'yoyoyo',
       }
       const savedUser = await User.create(fields)
 
@@ -137,11 +135,9 @@ describe('Authentication:', () => {
         },
         async send(result) {
           let user = await verifyToken(result.token)
-          user = await User.findById(user.id)
-            .lean()
-            .exec()
+          user = await User.findById(user.id).lean().exec()
           expect(user._id.toString()).toBe(savedUser._id.toString())
-        }
+        },
       }
 
       await signin(req, res)
@@ -160,7 +156,7 @@ describe('Authentication:', () => {
         },
         send(result) {
           expect(typeof result.message).toBe('string')
-        }
+        },
         // end() {
         //   expect(true).toBe(true)
         // }
@@ -172,15 +168,15 @@ describe('Authentication:', () => {
     test('token must have correct prefix', async () => {
       expect.assertions(2)
 
-      let req = { headers: { authorization: newToken({ id: '123sfkj' }) } }
-      let res = {
+      const req = { headers: { authorization: newToken({ id: '123sfkj' }) } }
+      const res = {
         status(status) {
           expect(status).toBe(401)
           return this
         },
         send(result) {
           expect(typeof result.message).toBe('string')
-        }
+        },
         // end() {
         //   expect(true).toBe(true)
         // }
@@ -200,7 +196,7 @@ describe('Authentication:', () => {
         },
         send(result) {
           expect(typeof result.message).toBe('string')
-        }
+        },
       }
 
       await protect(req, res)
@@ -209,7 +205,7 @@ describe('Authentication:', () => {
     test('finds user form token and passes on', async () => {
       const user = await User.create({
         email: 'hello@hello.com',
-        password: '1234'
+        password: '1234',
       })
       const token = `Bearer ${newToken(user)}`
       const req = { headers: { authorization: token } }

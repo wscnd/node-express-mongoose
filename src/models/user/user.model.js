@@ -7,35 +7,34 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      trim: true
+      trim: true,
     },
-
     password: {
       type: String,
-      required: true
+      required: true,
     },
     settings: {
       theme: {
         type: String,
         required: true,
-        default: 'dark'
+        default: 'dark',
       },
       notifications: {
         type: Boolean,
         required: true,
-        default: true
+        default: true,
       },
       compactMode: {
         type: Boolean,
         required: true,
-        default: false
-      }
-    }
+        default: false,
+      },
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 
-userSchema.pre('save', function(next) {
+userSchema.pre('save', function (next) {
   if (!this.isModified('password')) {
     return next()
   }
@@ -50,7 +49,7 @@ userSchema.pre('save', function(next) {
   })
 })
 
-userSchema.methods.checkPassword = function(password) {
+userSchema.methods.checkPassword = function (password) {
   const passwordHash = this.password
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, passwordHash, (err, same) => {

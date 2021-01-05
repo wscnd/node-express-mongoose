@@ -1,23 +1,24 @@
-import { getOne, getMany, createOne, updateOne, removeOne } from '../crud'
-import { List } from '../../resources/list/list.model'
-import { User } from '../../resources/user/user.model'
+import { expect } from '@jest/globals'
 import mongoose from 'mongoose'
+import { List } from '../../models/list/list.model'
+import { createOne, getMany, getOne, removeOne, updateOne } from '../crud'
+import errorHandler from '../errors'
 
 describe('crud controllers', () => {
-  describe('getOne', async () => {
+  describe('getOne', () => {
     test('finds by authenticated user and id', async () => {
-      expect.assertions(2)
+      expect.assertions(3)
 
       const user = mongoose.Types.ObjectId()
       const list = await List.create({ name: 'list', createdBy: user })
 
       const req = {
         params: {
-          id: list._id
+          id: list._id,
         },
         user: {
-          _id: user
-        }
+          _id: user,
+        },
       }
 
       const res = {
@@ -27,24 +28,27 @@ describe('crud controllers', () => {
         },
         json(result) {
           expect(result.data._id.toString()).toBe(list._id.toString())
-        }
+        },
       }
 
-      await getOne(List)(req, res)
+      const next = jest.fn()
+      expect(next).not.toHaveBeenCalled()
+
+      await getOne(List)(req, res, next)
     })
 
-    test('404 if no doc was found', async () => {
-      expect.assertions(2)
+    test('400 if no doc was found', async () => {
+      expect.assertions(4)
 
       const user = mongoose.Types.ObjectId()
 
       const req = {
         params: {
-          id: mongoose.Types.ObjectId()
+          id: mongoose.Types.ObjectId(),
         },
         user: {
-          _id: user
-        }
+          _id: user,
+        },
       }
 
       const res = {
@@ -52,30 +56,41 @@ describe('crud controllers', () => {
           expect(status).toBe(400)
           return this
         },
+        send(message) {
+          expect(message).toBe(JSON.stringify({ message: error.message }))
+          return this
+        },
+
         end() {
           expect(true).toBe(true)
-        }
+        },
       }
 
-      await getOne(List)(req, res)
+      const next = jest.fn()
+      const error = new Error('Not Found!')
+      error.status = 400
+
+      await getOne(List)(req, res, next)
+      expect(next).toHaveBeenCalled()
+      await errorHandler(error, req, res)
     })
   })
 
   describe('getMany', () => {
     test('finds array of docs by authenticated user', async () => {
-      expect.assertions(4)
+      expect.assertions(5)
 
       const user = mongoose.Types.ObjectId()
       await List.create([
         { name: 'list', createdBy: user },
         { name: 'other', createdBy: user },
-        { name: 'list', createdBy: mongoose.Types.ObjectId() }
+        { name: 'list', createdBy: mongoose.Types.ObjectId() },
       ])
 
       const req = {
         user: {
-          _id: user
-        }
+          _id: user,
+        },
       }
 
       const res = {
@@ -85,24 +100,29 @@ describe('crud controllers', () => {
         },
         json(result) {
           expect(result.data).toHaveLength(2)
-          result.data.forEach(doc => expect(`${doc.createdBy}`).toBe(`${user}`))
-        }
+          result.data.forEach((doc) =>
+            expect(`${doc.createdBy}`).toBe(`${user}`),
+          )
+        },
       }
 
-      await getMany(List)(req, res)
+      const next = jest.fn()
+
+      await getMany(List)(req, res, next)
+      expect(next).not.toHaveBeenCalled()
     })
   })
 
   describe('createOne', () => {
     test('creates a new doc', async () => {
-      expect.assertions(2)
+      expect.assertions(3)
 
       const user = mongoose.Types.ObjectId()
       const body = { name: 'name' }
 
       const req = {
         user: { _id: user },
-        body
+        body,
       }
 
       const res = {
@@ -112,21 +132,24 @@ describe('crud controllers', () => {
         },
         json(results) {
           expect(results.data.name).toBe(body.name)
-        }
+        },
       }
 
-      await createOne(List)(req, res)
+      const next = jest.fn()
+
+      await createOne(List)(req, res, next)
+      expect(next).not.toHaveBeenCalled()
     })
 
     test('createdBy should be the authenticated user', async () => {
-      expect.assertions(2)
+      expect.assertions(3)
 
       const user = mongoose.Types.ObjectId()
       const body = { name: 'name' }
 
       const req = {
         user: { _id: user },
-        body
+        body,
       }
 
       const res = {
@@ -136,16 +159,19 @@ describe('crud controllers', () => {
         },
         json(results) {
           expect(`${results.data.createdBy}`).toBe(`${user}`)
-        }
+        },
       }
 
-      await createOne(List)(req, res)
+      const next = jest.fn()
+
+      await createOne(List)(req, res, next)
+      expect(next).not.toHaveBeenCalled()
     })
   })
 
   describe('updateOne', () => {
     test('finds doc by authenticated user and id to update', async () => {
-      expect.assertions(3)
+      expect.assertions(4)
 
       const user = mongoose.Types.ObjectId()
       const list = await List.create({ name: 'name', createdBy: user })
@@ -154,7 +180,7 @@ describe('crud controllers', () => {
       const req = {
         params: { id: list._id },
         user: { _id: user },
-        body: update
+        body: update,
       }
 
       const res = {
@@ -165,14 +191,16 @@ describe('crud controllers', () => {
         json(results) {
           expect(`${results.data._id}`).toBe(`${list._id}`)
           expect(results.data.name).toBe(update.name)
-        }
+        },
       }
+      const next = jest.fn()
 
-      await updateOne(List)(req, res)
+      await updateOne(List)(req, res, next)
+      expect(next).not.toHaveBeenCalled()
     })
 
     test('400 if no doc', async () => {
-      expect.assertions(2)
+      expect.assertions(4)
 
       const user = mongoose.Types.ObjectId()
       const update = { name: 'hello' }
@@ -180,7 +208,7 @@ describe('crud controllers', () => {
       const req = {
         params: { id: mongoose.Types.ObjectId() },
         user: { _id: user },
-        body: update
+        body: update,
       }
 
       const res = {
@@ -188,12 +216,21 @@ describe('crud controllers', () => {
           expect(status).toBe(400)
           return this
         },
+        send(message) {
+          expect(message).toBe(JSON.stringify({ message: error.message }))
+        },
         end() {
           expect(true).toBe(true)
-        }
+        },
       }
 
-      await updateOne(List)(req, res)
+      const next = jest.fn()
+      const error = new Error('Not Found!')
+      error.status = 400
+
+      await updateOne(List)(req, res, next)
+      expect(next).toHaveBeenCalled()
+      await errorHandler(error, req, res)
     })
   })
 
@@ -206,7 +243,7 @@ describe('crud controllers', () => {
 
       const req = {
         params: { id: list._id },
-        user: { _id: user }
+        user: { _id: user },
       }
 
       const res = {
@@ -216,19 +253,20 @@ describe('crud controllers', () => {
         },
         json(results) {
           expect(`${results.data._id}`).toBe(`${list._id}`)
-        }
+        },
       }
+      const next = jest.fn()
 
-      await removeOne(List)(req, res)
+      await removeOne(List)(req, res, next)
     })
 
     test('400 if no doc', async () => {
-      expect.assertions(2)
+      expect.assertions(4)
       const user = mongoose.Types.ObjectId()
 
       const req = {
         params: { id: mongoose.Types.ObjectId() },
-        user: { _id: user }
+        user: { _id: user },
       }
 
       const res = {
@@ -236,12 +274,22 @@ describe('crud controllers', () => {
           expect(status).toBe(400)
           return this
         },
+        send(message) {
+          expect(message).toBe(JSON.stringify({ message: error.message }))
+          return this
+        },
         end() {
           expect(true).toBe(true)
-        }
+        },
       }
 
-      await removeOne(List)(req, res)
+      const next = jest.fn()
+      const error = new Error('Not Found!')
+      error.status = 400
+
+      await removeOne(List)(req, res, next)
+      expect(next).toHaveBeenCalled()
+      await errorHandler(error, req, res)
     })
   })
 })

@@ -7,12 +7,12 @@ describe('item router', () => {
       { path: '/:id', method: 'get' },
       { path: '/:id', method: 'delete' },
       { path: '/:id', method: 'put' },
-      { path: '/', method: 'post' }
+      { path: '/', method: 'post' },
     ]
 
-    routes.forEach(route => {
+    routes.forEach((route) => {
       const match = router.stack.find(
-        s => s.route.path === route.path && s.route.methods[route.method]
+        (s) => s.route.path === route.path && s.route.methods[route.method],
       )
       expect(match).toBeTruthy()
     })

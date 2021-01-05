@@ -9,7 +9,7 @@ describe('Item model', () => {
         type: String,
         required: true,
         trim: true,
-        maxlength: 50
+        maxlength: 50,
       })
     })
 
@@ -19,7 +19,7 @@ describe('Item model', () => {
         type: String,
         required: true,
         enum: ['active', 'complete', 'pastdue'],
-        default: 'active'
+        default: 'active',
       })
     })
 
@@ -38,7 +38,7 @@ describe('Item model', () => {
       expect(createdBy).toEqual({
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'user',
-        required: true
+        required: true,
       })
     })
 
@@ -47,7 +47,7 @@ describe('Item model', () => {
       expect(list).toEqual({
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'list',
-        required: true
+        required: true,
       })
     })
   })

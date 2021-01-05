@@ -6,16 +6,16 @@ const listSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 50
+      maxlength: 50,
     },
     description: String,
     createdBy: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'user',
-      required: true
-    }
+      required: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 
 listSchema.index({ user: 1, name: 1 }, { unique: true })

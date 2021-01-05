@@ -1,16 +1,14 @@
 import mongoose from 'mongoose'
 import cuid from 'cuid'
 import _ from 'lodash'
-import { Item } from './src/resources/item/item.model'
-import { List } from './src/resources/list/list.model'
-import { User } from './src/resources/user/user.model'
+import { Item } from '../src/models/item/item.model'
+import { List } from '../src/models/list/list.model'
+import { User } from '../src/models/user/user.model'
+import config from '../src/config'
 
 const models = { User, List, Item }
 
-const url =
-  process.env.MONGODB_URI ||
-  process.env.DB_URL ||
-  'mongodb://localhost:27017/tipe-devapi-testing'
+const url = config.dbUrl
 
 global.newId = () => {
   return mongoose.Types.ObjectId()
@@ -18,7 +16,7 @@ global.newId = () => {
 
 const remove = collection =>
   new Promise((resolve, reject) => {
-    collection.remove(err => {
+    collection.deleteMany(err => {
       if (err) return reject(err)
       resolve()
     })
@@ -32,13 +30,13 @@ beforeEach(async done => {
 
   if (mongoose.connection.readyState === 0) {
     try {
-      await mongoose.connect(
-        url + db,
-        {
-          useNewUrlParser: true,
-          autoIndex: true
-        }
-      )
+      await mongoose.connect(url + db, {
+        useNewUrlParser: true,
+        autoIndex: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+        useFindAndModify: false,
+      })
       await clearDB()
       await Promise.all(Object.keys(models).map(name => models[name].init()))
     } catch (e) {

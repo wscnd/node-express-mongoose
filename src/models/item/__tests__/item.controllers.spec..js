@@ -8,11 +8,11 @@ describe('item controllers', () => {
       'getMany',
       'createOne',
       'removeOne',
-      'updateOne'
+      'updateOne',
     ]
 
-    crudMethods.forEach(name =>
-      expect(isFunction(controllers[name])).toBe(true)
+    crudMethods.forEach((name) =>
+      expect(isFunction(controllers[name])).toBe(true),
     )
   })
 })

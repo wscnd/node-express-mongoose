@@ -1,15 +1,17 @@
 import { merge } from 'lodash'
-const env = process.env.NODE_ENV || 'development'
+require('dotenv-flow').config()
 
+const env = process.env.NODE_ENV
 const baseConfig = {
   env,
   isDev: env === 'development',
   isTest: env === 'testing',
-  port: 3000,
+  port: process.env.PORT,
   secrets: {
     jwt: process.env.JWT_SECRET,
-    jwtExp: '100d'
-  }
+    jwtExp: '100d',
+  },
+  dbUrl: process.env.MONGODB_URI,
 }
 
 let envConfig = {}

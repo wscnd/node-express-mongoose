@@ -6,28 +6,28 @@ const itemSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 50
+      maxlength: 50,
     },
     status: {
       type: String,
       required: true,
       enum: ['active', 'complete', 'pastdue'],
-      default: 'active'
+      default: 'active',
     },
     notes: String,
     due: Date,
     createdBy: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'user',
-      required: true
+      required: true,
     },
     list: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'list',
-      required: true
-    }
+      required: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 
 itemSchema.index({ list: 1, name: 1 }, { unique: true })

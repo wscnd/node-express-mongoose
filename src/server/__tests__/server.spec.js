@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { app } from '../server'
-import { User } from '../resources/user/user.model'
-import { newToken } from '../utils/auth'
+import { User } from '../../models/user/user.model'
+import { newToken } from '../../utils/auth'
 import mongoose from 'mongoose'
 
 describe('API Authentication:', () => {
@@ -27,24 +27,14 @@ describe('API Authentication:', () => {
       const jwt = `Bearer ${token}`
       const id = mongoose.Types.ObjectId()
       const results = await Promise.all([
-        request(app)
-          .get('/api/item')
-          .set('Authorization', jwt),
-        request(app)
-          .get(`/api/item/${id}`)
-          .set('Authorization', jwt),
-        request(app)
-          .post('/api/item')
-          .set('Authorization', jwt),
-        request(app)
-          .put(`/api/item/${id}`)
-          .set('Authorization', jwt),
-        request(app)
-          .delete(`/api/item/${id}`)
-          .set('Authorization', jwt)
+        request(app).get('/api/item').set('Authorization', jwt),
+        request(app).get(`/api/item/${id}`).set('Authorization', jwt),
+        request(app).post('/api/item').set('Authorization', jwt),
+        request(app).put(`/api/item/${id}`).set('Authorization', jwt),
+        request(app).delete(`/api/item/${id}`).set('Authorization', jwt),
       ])
 
-      results.forEach(res => expect(res.statusCode).not.toBe(401))
+      results.forEach((res) => expect(res.statusCode).not.toBe(401))
     })
   })
 })
