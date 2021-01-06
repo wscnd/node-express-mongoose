@@ -60,7 +60,7 @@ export const protect = async (req, res, next) => {
       return next(createError(401, 'You must be logged in.'))
     }
 
-    const token = authorization.split('Bearer ')[1]
+    const token = authorization.slice('Bearer '.length)
 
     const verification = await verifyToken(token)
 

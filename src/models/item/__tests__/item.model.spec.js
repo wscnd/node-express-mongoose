@@ -47,7 +47,7 @@ describe('Item model', () => {
       expect(list).toEqual({
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'list',
-        required: true,
+        required: [true, 'List Required!'],
       })
     })
   })

@@ -33,9 +33,9 @@ describe('crud controllers', () => {
       }
 
       const next = jest.fn()
-      expect(next).not.toHaveBeenCalled()
 
       await getOne(List)(req, res, next)
+      expect(next).not.toHaveBeenCalled()
     })
 
     test('400 if no doc was found', async () => {
