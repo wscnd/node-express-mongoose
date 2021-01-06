@@ -8,6 +8,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       trim: true,
+      validate: {
+        validator: function (v) {
+          // eslint-disable-next-line
+          return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v)
+        },
+        message: 'Please enter a valid email',
+      },
     },
     password: {
       type: String,
