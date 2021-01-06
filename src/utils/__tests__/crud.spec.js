@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import { List } from '../../models/list/list.model'
 import { createOne, getMany, getOne, removeOne, updateOne } from '../crud'
 import errorHandler from '../errors'
+import CreateError from 'http-errors'
 
 describe('crud controllers', () => {
   describe('getOne', () => {
@@ -38,7 +39,7 @@ describe('crud controllers', () => {
     })
 
     test('400 if no doc was found', async () => {
-      expect.assertions(4)
+      expect.assertions(5)
 
       const user = mongoose.Types.ObjectId()
 
@@ -60,18 +61,17 @@ describe('crud controllers', () => {
           expect(message).toBe(JSON.stringify({ message: error.message }))
           return this
         },
-
         end() {
           expect(true).toBe(true)
         },
       }
 
       const next = jest.fn()
-      const error = new Error('Not Found!')
-      error.status = 400
+      const error = new CreateError(400, 'Not Found!')
 
       await getOne(List)(req, res, next)
       expect(next).toHaveBeenCalled()
+      expect(next).toHaveBeenCalledWith(error)
       await errorHandler(error, req, res)
     })
   })
@@ -200,7 +200,7 @@ describe('crud controllers', () => {
     })
 
     test('400 if no doc', async () => {
-      expect.assertions(4)
+      // expect.assertions(5)
 
       const user = mongoose.Types.ObjectId()
       const update = { name: 'hello' }
@@ -225,11 +225,11 @@ describe('crud controllers', () => {
       }
 
       const next = jest.fn()
-      const error = new Error('Not Found!')
-      error.status = 400
+      const error = CreateError(400, 'Not Found!')
 
       await updateOne(List)(req, res, next)
       expect(next).toHaveBeenCalled()
+      expect(next).toHaveBeenCalledWith(error)
       await errorHandler(error, req, res)
     })
   })
@@ -261,7 +261,7 @@ describe('crud controllers', () => {
     })
 
     test('400 if no doc', async () => {
-      expect.assertions(4)
+      expect.assertions(5)
       const user = mongoose.Types.ObjectId()
 
       const req = {
@@ -284,11 +284,11 @@ describe('crud controllers', () => {
       }
 
       const next = jest.fn()
-      const error = new Error('Not Found!')
-      error.status = 400
+      const error = new CreateError(400, 'Not Found!')
 
       await removeOne(List)(req, res, next)
       expect(next).toHaveBeenCalled()
+      expect(next).toHaveBeenCalledWith(error)
       await errorHandler(error, req, res)
     })
   })

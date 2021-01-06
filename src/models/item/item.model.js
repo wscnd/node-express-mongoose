@@ -24,12 +24,18 @@ const itemSchema = new mongoose.Schema(
     list: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'list',
-      required: true,
+      required: [true, 'List Required!'],
     },
   },
   { timestamps: true },
 )
 
 itemSchema.index({ list: 1, name: 1 }, { unique: true })
+
+itemSchema.pre('findOneAndUpdate', function (next, data) {
+  console.log('findOneAndUpdate')
+  console.log(this._update)
+  next()
+})
 
 export const Item = mongoose.model('item', itemSchema)

@@ -11,6 +11,6 @@ export default function (err, req, res, next) {
   code:
   errmsg: */
 
-  res.status(err.status || 500).send(JSON.stringify({ message: err.message }))
+  res.status(err.status).send(JSON.stringify({ message: err.message }))
   res.end()
 }

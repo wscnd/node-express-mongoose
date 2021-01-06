@@ -4,7 +4,7 @@ import controllers from './list.controllers'
 const router = Router()
 
 // /api/list
-router.route('/').get(controllers.getOne).post(controllers.createOne)
+router.route('/').get(controllers.getManyWithPage).post(controllers.createOne)
 
 // /api/list/:id
 router

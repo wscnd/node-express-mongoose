@@ -14,18 +14,18 @@ global.newId = () => {
   return mongoose.Types.ObjectId()
 }
 
-const remove = collection =>
+const remove = (collection) =>
   new Promise((resolve, reject) => {
-    collection.deleteMany(err => {
+    collection.deleteMany((err) => {
       if (err) return reject(err)
       resolve()
     })
   })
 
-beforeEach(async done => {
+beforeEach(async (done) => {
   const db = cuid()
   function clearDB() {
-    return Promise.all(_.map(mongoose.connection.collections, c => remove(c)))
+    return Promise.all(_.map(mongoose.connection.collections, (c) => remove(c)))
   }
 
   if (mongoose.connection.readyState === 0) {
@@ -38,7 +38,7 @@ beforeEach(async done => {
         useFindAndModify: false,
       })
       await clearDB()
-      await Promise.all(Object.keys(models).map(name => models[name].init()))
+      await Promise.all(Object.keys(models).map((name) => models[name].init()))
     } catch (e) {
       console.log('connection error')
       console.error(e)
@@ -49,11 +49,11 @@ beforeEach(async done => {
   }
   done()
 })
-afterEach(async done => {
+afterEach(async (done) => {
   await mongoose.connection.db.dropDatabase()
   await mongoose.disconnect()
   return done()
 })
-afterAll(done => {
+afterAll((done) => {
   return done()
 })

@@ -26,8 +26,8 @@ app.use('/api/signup', signup)
 
 app.use(protect)
 app.use('/api/user', userRouter)
-app.use('/api/item', itemRouter)
 app.use('/api/list', listRouter)
+app.use('/api/item', itemRouter)
 app.use(error)
 
 const onListening = () => {
@@ -43,6 +43,7 @@ export const start = async () => {
         useNewUrlParser: true,
         useCreateIndex: true,
         useUnifiedTopology: true,
+        useFindAndModify: false,
       },
     })
     app.listen(config.port, () => {
