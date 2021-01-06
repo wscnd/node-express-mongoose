@@ -7,24 +7,35 @@ import { connect } from '../utils/db'
 import userRouter from '../models/user/user.router'
 import itemRouter from '../models/item/item.router'
 import listRouter from '../models/list/list.router'
-import { signup, signin, protect } from '../utils/auth'
+// import { signup, signin, protect } from '../utils/auth'
+import {
+  signupWithCookie,
+  signinWithCookie,
+  protectCookie,
+} from '../utils/auth.cookies'
 import error from '../utils/errors'
 import helmet from 'helmet'
 import getDebugger from 'debug'
+import cookieParser from 'cookie-parser'
 
 export const app = express()
 const debug = getDebugger('app')
 
+app.use(cookieParser())
 app.use(cors())
 app.use(json())
 app.use(urlencoded({ extended: true }))
 app.use(morgan('dev'))
 app.use(helmet())
 
-app.use('/api/signin', signin)
-app.use('/api/signup', signup)
+// app.use('/api/signin', signin)
+// app.use('/api/signup', signup)
+// app.use(protect)
 
-app.use(protect)
+app.use('/api/users', signupWithCookie)
+app.use('/api/authenticate', signinWithCookie)
+
+app.use(protectCookie)
 app.use('/api/userprofile', userRouter)
 app.use('/api/list', listRouter)
 app.use('/api/item', itemRouter)

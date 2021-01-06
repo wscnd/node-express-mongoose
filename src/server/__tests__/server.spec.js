@@ -34,6 +34,20 @@ describe('API Authentication:', () => {
         request(app).delete(`/api/item/${id}`).set('Authorization', jwt),
       ])
 
+      results.forEach((res) => expect(res.statusCode).toBe(401))
+    })
+
+    test('passes with Cookie', async () => {
+      const cookie = `token=${token}`
+      const id = mongoose.Types.ObjectId()
+      const results = await Promise.all([
+        request(app).get('/api/item').set('Cookie', cookie),
+        request(app).get(`/api/item/${id}`).set('Cookie', cookie),
+        request(app).post('/api/item').set('Cookie', cookie),
+        request(app).put(`/api/item/${id}`).set('Cookie', cookie),
+        request(app).delete(`/api/item/${id}`).set('Cookie', cookie),
+      ])
+
       results.forEach((res) => expect(res.statusCode).not.toBe(401))
     })
   })
