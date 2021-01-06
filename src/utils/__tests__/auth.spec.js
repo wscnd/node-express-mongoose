@@ -170,7 +170,7 @@ describe('Authentication:', () => {
       const req = { body: fields }
       const res = {
         status(status) {
-          expect(status).toBe(201)
+          expect(status).toBe(200)
           return this
         },
         async send(result) {
@@ -179,7 +179,9 @@ describe('Authentication:', () => {
           expect(user._id.toString()).toBe(savedUser._id.toString())
         },
       }
+
       const next = jest.fn()
+
       await signin(req, res, next)
       expect(next).not.toHaveBeenCalled()
     })

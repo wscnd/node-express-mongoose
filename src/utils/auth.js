@@ -2,11 +2,16 @@ import config from '../config'
 import { User } from '../models/user/user.model'
 import jwt from 'jsonwebtoken'
 import createError from 'http-errors'
+const jwtDecode = require('jwt-decode')
 
 export const newToken = (user) => {
-  return jwt.sign({ id: user.id }, config.secrets.jwt, {
-    expiresIn: config.secrets.jwtExp,
-  })
+  return jwt.sign(
+    { id: user.id, email: user.email, iss: 'api.wscnd', aud: 'api.wscnd' },
+    config.secrets.jwt,
+    {
+      expiresIn: config.secrets.jwtExp,
+    },
+  )
 }
 
 export const verifyToken = (token) =>
@@ -45,8 +50,12 @@ export const signin = async (req, res, next) => {
     }
 
     await user.checkPassword(password)
+
     const token = newToken(user)
-    return res.status(201).send({ token })
+    const decodedToken = jwtDecode(token)
+
+    console.log('decodedToken:', decodedToken)
+    return res.status(200).send({ token })
   } catch (err) {
     return next(createError(401, `Wrong user or password`))
   }
@@ -78,5 +87,17 @@ export const protect = async (req, res, next) => {
     return next(createError(401, 'Invalid User'))
   }
 
+  next()
+}
+
+export const requireAdmin = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      message: 'There was a problem authorizing the request',
+    })
+  }
+  if (req.user.role !== 'admin') {
+    return res.status(401).json({ message: 'Insufficient role' })
+  }
   next()
 }

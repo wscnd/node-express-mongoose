@@ -25,12 +25,12 @@ app.use('/api/signin', signin)
 app.use('/api/signup', signup)
 
 app.use(protect)
-app.use('/api/user', userRouter)
+app.use('/api/userprofile', userRouter)
 app.use('/api/list', listRouter)
 app.use('/api/item', itemRouter)
 app.use(error)
 
-const onListening = () => {
+function onListening() {
   const addr = app.address()
   const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
   debug('Listening on port' + bind)

@@ -9,7 +9,7 @@ const baseConfig = {
   port: process.env.PORT,
   secrets: {
     jwt: process.env.JWT_SECRET,
-    jwtExp: '100d',
+    jwtExp: '1h',
   },
   dbUrl: process.env.MONGODB_URI,
 }
