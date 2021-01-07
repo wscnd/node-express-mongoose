@@ -8,7 +8,11 @@ const role = (...roles) => async (req, res, next) => {
     return next(createError(401, 'User not found!'))
   }
 
-  const userModel = await User.findById(user.id).select('role status').lean()
+  const userModel = await User.findById(user._id).select('role status').lean()
+
+  if (!userModel) {
+    return next(createError(401, `User ${JSON.stringify(user)} not found!`))
+  }
 
   if (userModel.status !== 'active') {
     return next(createError(401, 'User not active!'))
@@ -17,7 +21,7 @@ const role = (...roles) => async (req, res, next) => {
   const isValid = roles.includes(userModel.role)
 
   if (!isValid) {
-    return next(createError(401, 'User not valid!'))
+    return next(createError(401, "User don't have permissions"))
   }
 
   next()
