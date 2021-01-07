@@ -1,12 +1,12 @@
 import { User } from './user.model'
-
+import createError from 'http-errors'
 import { crudControllers } from '../../utils/crud'
 
 const me = (req, res) => {
   return res.status(200).json({ data: req.user })
 }
 
-const updateMe = async (req, res) => {
+const updateMe = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(req.user._id, req.body, {
       new: true,
@@ -15,9 +15,8 @@ const updateMe = async (req, res) => {
       .lean()
       .exec()
     return res.status(200).json({ data: user })
-  } catch (e) {
-    console.error(e)
-    return res.status(400).end()
+  } catch (err) {
+    return next(createError(400, err.message))
   }
 }
 
