@@ -7,6 +7,16 @@ const me = (req, res) => {
 }
 
 const updateMe = async (req, res, next) => {
+  const requestedRole = req.body?.role ?? undefined
+  // const { role: UserRole } = req.user
+
+  if (requestedRole) {
+    const forbiddenRoles = ['admin', 'master']
+    if (forbiddenRoles.includes(requestedRole)) {
+      return next(createError(400, "Can't update Roles"))
+    }
+  }
+
   try {
     const user = await User.findByIdAndUpdate(req.user._id, req.body, {
       new: true,
@@ -15,44 +25,6 @@ const updateMe = async (req, res, next) => {
       .lean()
       .exec()
     return res.status(200).json({ data: user })
-  } catch (err) {
-    return next(createError(400, err.message))
-  }
-}
-
-const elevateMe = async (req, res, next) => {
-  try {
-    const user = await User.findByIdAndUpdate(req.user._id, req.body, {
-      new: true,
-      runValidators: true,
-    })
-      .lean()
-      .exec()
-    return res.status(200).json({ data: user })
-  } catch (err) {
-    return next(createError(400, err.message))
-  }
-}
-
-const elevateUser = (userToBeElevated) => async (req, res, next) => {
-  try {
-    const user = await User.findByIdAndUpdate(userToBeElevated, req.body, {
-      new: true,
-      runValidators: true,
-    })
-      .lean()
-      .exec()
-    return res.status(200).json({ data: user })
-  } catch (err) {
-    return next(createError(400, err.message))
-  }
-}
-
-const getAllUsers = async (req, res, next) => {
-  try {
-    const docs = await User.find({}).select('email role status').lean().exec()
-
-    res.status(200).json({ data: docs })
   } catch (err) {
     return next(createError(400, err.message))
   }
@@ -61,9 +33,6 @@ const getAllUsers = async (req, res, next) => {
 const customControllers = {
   me,
   updateMe,
-  elevateMe,
-  elevateUser,
-  getAllUsers,
 }
 
 export default crudControllers(User, { ...customControllers })

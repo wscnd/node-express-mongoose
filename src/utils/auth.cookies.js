@@ -26,9 +26,14 @@ export const signinWithCookie = async (req, res, next) => {
     }
 
     const user = await User.findOne({ email }).exec()
+    console.log('user:', user)
 
     if (!user) {
       return next(createError(401, 'Invalid email and password'))
+    }
+
+    if (user.status === 'inactive') {
+      return next(createError(401, 'User inactive'))
     }
 
     await user.checkPassword(password)

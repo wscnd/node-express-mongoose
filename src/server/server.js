@@ -5,6 +5,7 @@ import config from '../config'
 import cors from 'cors'
 import { connect } from '../utils/db'
 import userRouter from '../models/user/user.router'
+import adminRouter from '../models/user/admin.router'
 import itemRouter from '../models/item/item.router'
 import listRouter from '../models/list/list.router'
 // import { signup, signin, protect } from '../utils/auth'
@@ -37,6 +38,7 @@ app.use('/api/authenticate', signinWithCookie)
 
 app.use(protectCookie)
 app.use('/api/userprofile', userRouter)
+app.use('/api/admin', adminRouter)
 app.use('/api/list', listRouter)
 app.use('/api/item', itemRouter)
 app.use(error)
