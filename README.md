@@ -10,7 +10,7 @@
 
 ## About
 
-I attended this course that has a great base api design, I tweaked and added more resources to the original config.
+Expanded original repo with authentication to api routes, added more layers of security, generalized models and improved tests.
 
 ## Env
 
